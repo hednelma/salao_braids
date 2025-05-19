@@ -37,17 +37,20 @@ const upload = multer({ storage })
 
 routes.get('/find/all/clientes', async (req, res) => {
 
-    try{
+    console.log("Chegeui aqui....")
+
+    try {
         const clientes = await Cliente.findAll({
             attributes: ['id', 'nome', 'foto', 'role'],
         })
 
-        if(clientes)
+        if (clientes)
             res.status(200).json(clientes)
         else
-        res.status(200).json({message: 'Sem clientes.......'})
-    
-    }catch (error) {
+            res.status(200).json({ message: 'Sem clientes.......' })
+
+    } catch (error) {
+        console.log("Chegeui errando aqui....")
 
     }
 })
@@ -65,12 +68,12 @@ routes.get('/find/all/services', async (req, res) => {
     }
 })
 
-routes.post('/add/servico',  upload.single('imagem'), async (req, res) => {
+routes.post('/add/servico', upload.single('imagem'), async (req, res) => {
 
     console.log("ESESESESESESES")
 
     try {
-        const {nome ,descricao, duracao, preco  } = req.body
+        const { nome, descricao, duracao, preco } = req.body
 
         if (!nome || !duracao || !preco || !descricao) {
             return res.status(400).json({ message: 'Todos os campos são obrigatórios!' })
@@ -78,7 +81,7 @@ routes.post('/add/servico',  upload.single('imagem'), async (req, res) => {
 
         const imagem = req.file ? `/uploads/${req.file.filename}` : null
 
-        const newServico = await Servicos.create({ nome ,descricao, duracao, preco , imagem })
+        const newServico = await Servicos.create({ nome, descricao, duracao, preco, imagem })
 
         res.status(200).json(newServico)
 
@@ -103,7 +106,7 @@ routes.put('/edit/servico/:id', upload.single('imagem'), async (req, res) => {
         if (imagem === 'null') {
             newimagem = null
         } else if (req.file) {
-            newimagem =`/uploads/${req.file.filename}`
+            newimagem = `/uploads/${req.file.filename}`
         }
 
 
@@ -139,7 +142,7 @@ routes.delete('/delete/servico/:id', async (req, res) => {
         if (!servico) {
             return res.status(404).json({ message: 'Serviço não encontrado.' })
         }
-// ele pega o caminho da imagem para remover na pasta de upload
+        // ele pega o caminho da imagem para remover na pasta de upload
         const imagePath = servico.imagem
 
         if (imagePath) {
