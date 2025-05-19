@@ -68,6 +68,6 @@ Servicos.hasMany(ServicoProfissional, {
 
 
 
-//ServicoProfissional.sync({force:true})
+ServicoProfissional.sync({force:true})
 
 module.exports = ServicoProfissional

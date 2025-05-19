@@ -64,6 +64,6 @@ Agendamento.belongsTo(Servicos, { foreignKey: 'servicoId', as: 'service'})
 
 
 
-//Agendamento.sync({ force: true })
+Agendamento.sync({ force: true })
 
 module.exports = Agendamento
