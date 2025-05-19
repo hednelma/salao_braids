@@ -17,7 +17,7 @@ app.use('/visitante', visitante)
 app.use('/cliente', cliente)
 app.use('/administrador', administrador)
 
-get('/', (req, res) => {
+app.get('/', (req, res) => {
     res.send("Essta funcionando...")
 })
 
