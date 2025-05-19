@@ -13,12 +13,14 @@ app.use('/visitante', visitante)
 
 
 //Rotas
-app.use('/visitante',visitante)
+app.use('/visitante', visitante)
 app.use('/cliente', cliente)
 app.use('/administrador', administrador)
 
+get('/', (req, res) => {
+    res.send("Essta funcionando...")
+})
 
-
-app.listen(port, ()=>{
+app.listen(port, () => {
     console.log('Server is ronning on port', port)
 })
