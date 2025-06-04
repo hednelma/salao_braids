@@ -55,15 +55,15 @@ Clientes.hasMany(Agendamento, {foreignKey: 'clienteId', as: 'clienteAgendamentos
 Agendamento.belongsTo(Clientes, {foreignKey: 'clienteId', as: 'client'})
 
 
-Clientes.hasMany(Agendamento, { foreignKey: 'professionalId', as: 'professionalAgendamentos', onDelete: 'CASCADE'})
-Agendamento.belongsTo(Clientes, { foreignKey: 'professionalId', as: 'professional'})
+Clientes.hasMany(Agendamento, { foreignKey: 'profissionalId', as: 'professionalAgendamentos', onDelete: 'CASCADE'})
+Agendamento.belongsTo(Clientes, { foreignKey: 'profissionalId', as: 'professional'})
 
 
 Servicos.hasMany(Agendamento, { foreignKey: 'servicoId', as: 'Agendamentos',  onDelete: 'CASCADE'})
-Agendamento.belongsTo(Servicos, { foreignKey: 'servicoId', as: 'service'})
+Agendamento.belongsTo(Servicos, { foreignKey: 'servicoId', as: 'servico'})
 
 
 
-Agendamento.sync({ force: true })
+//Agendamento.sync({ alter: true })
 
 module.exports = Agendamento

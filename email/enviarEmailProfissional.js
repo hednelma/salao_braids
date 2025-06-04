@@ -3,7 +3,7 @@ require('dotenv/config')
 
 module.exports = {
 
-    enviarEmail: async (user) => {
+    enviarEmailProfissional: async (user) => {
         const transport = email.createTransport({
             service: 'gmail',
             auth: {
@@ -21,7 +21,7 @@ module.exports = {
             <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #ECF2F5;">
                 <div style="max-width: 600px; margin: 0 auto; padding: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px;">
                     <h2 style="color: #fbde89;">Bem-vindo(a) ao salão braids!</h2>
-                    <p>Olá, <strong>${user.nome}</strong>,</p>
+                    <p>Olá, Profissional <strong>${user.nome}</strong>,</p>
                     <p>Seja bem-vindo(a) ao salão braids! Esta aplicaçãoo podes fazer agendamentos das suas tranças, </p>
                     <h3 style="color: #fbde89;">O que você precisa saber:</h3>
                     <ul style="padding-left: 20px;">
@@ -29,7 +29,7 @@ module.exports = {
                         <strong>Acesso:</strong> Você poderá acessar usando:
                         <ul style="padding-left: 20px;">
                             <li style="color: #fbde89; text-decoration: none;">Nome de utilizador: ${user.nomeutilizador}</li>
-                            <li style="text-decoration: none;">A sua senha é a mesma que você usou para se registrar</li>.   
+                            <li style="text-decoration: none;">A sua senha de acesso:${user.senha} </li>.   
                         </ul>
                     </li>
                     <li>

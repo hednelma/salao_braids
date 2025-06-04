@@ -5,7 +5,12 @@ const multer = require('multer')
 const path = require('path')
 const fs = require('fs')
 const { Op } = require('sequelize')
+const Email = require('./../email/enviarEmailProfissional')
 const Servicos = require('../models/Servisos')
+const bcrypt = require('bcryptjs')
+const generateUserName = require('../funçao/generateUserName')
+const ServicoProfissional = require('../models/ServicoProfissional')
+const Agendamento = require('../models/Agendamento')
 
 
 const UPLOADS_DIR = path.join(__dirname, 'uploads')
@@ -36,9 +41,6 @@ const upload = multer({ storage })
 
 
 routes.get('/find/all/clientes', async (req, res) => {
-
-    console.log("Chegeui aqui....")
-
     try {
         const clientes = await Cliente.findAll({
             attributes: ['id', 'nome', 'foto', 'role'],
@@ -54,6 +56,111 @@ routes.get('/find/all/clientes', async (req, res) => {
 
     }
 })
+
+//----------Profissional---------------
+routes.post('/new_profissional', async (req, res) => {
+    try {
+        const { nome, senha, email } = req.body
+        const nomeutilizador = await generateUserName(nome)
+        //fazer incripitacao
+        const salt = bcrypt.genSaltSync(10)
+        const passwordHash = bcrypt.hashSync(senha, salt)
+        const user = await Cliente.create({ nome, nomeutilizador, email, senha: passwordHash, role: 1 })
+        if (user) {
+            Email.enviarEmailProfissional({ email, nome, nomeutilizador, senha })
+            res.status(200).json(user)
+        }
+        else
+            res.status(400).json({ message: "Erro ao criar usuario" })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: "Erro ao registar", error: error.message })
+    }
+})
+
+
+// endpoint de remover profissional
+routes.delete('/delete/profissional/:profissionalId', async (req, res) => {
+    console.log('Antes do Cheguei aqui')
+    try {
+        console.log('Cheguei aqui', req.params)
+        const { profissionalId } = req.params
+
+        const profissional = await Cliente.findByPk(profissionalId)
+        console.log(profissional)
+        if (!profissional) {
+            return res.status(404).json({ message: 'Profissional não encontrado.' })
+        }
+        // ele pega o caminho da imagem para remover na pasta de upload
+        const imagePath = profissional.foto
+
+        if (imagePath) {
+
+            const fullImagePath = path.join(UPLOADS_DIR, path.basename(imagePath))
+
+            if (fs.existsSync(fullImagePath)) {
+                fs.unlinkSync(fullImagePath)
+            }
+
+        }
+
+        await profissional.destroy()
+
+        res.status(200).json({ message: 'Profissional removido com sucesso!' })
+
+    } catch (error) {
+        console.log('Cheguei aqui com erro: ', error)
+        console.error('Erro ao remover profissional:', error)
+        res.status(500).json({ message: 'Erro interno no servidor.' })
+    }
+})
+
+
+//-------Atribuir Serviço ao profissional
+routes.post('/add/service/ao/profissional', async (req, res) => {
+
+    try {
+        const { profissionalId, services } = req.body
+
+        for await (const service of services) {
+            try {
+                const new_service = await ServicoProfissional.create({ ServicoId: service, profissionalId: profissionalId })
+            } catch (error) {
+                console.log('Não fi possivel adicionar este serviço ao profissional', error)
+            }
+        }
+
+        res.status(200).json({ message: "Sucesso ao atribuir serviços ao profissional" })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: "Erro ao atribuir serviços ao profissional", error: error.message })
+    }
+})
+
+//remover servico de um profissional
+
+routes.delete('/remover/service/ao/profissional/:profissionalId/:ServicoId', async (req, res) => {
+
+    try {
+
+        const { profissionalId, ServicoId } = req.params
+        const professionalService = await ServicoProfissional.findOne({ where: { profissionalId, ServicoId } })
+        if (professionalService) {
+            await professionalService.destroy()
+            res.status(200).json({ message: "Serviço removido com sucesso" })
+        }
+        else
+            res.status(400).json({ message: "Serviço não encontrado" })
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: "Erro ao atribuir serviços ao profissional", error: error.message })
+    }
+})
+
 
 //--------------------Serviços----------------------------
 routes.get('/find/all/services', async (req, res) => {
@@ -164,6 +271,26 @@ routes.delete('/delete/servico/:id', async (req, res) => {
         res.status(500).json({ message: 'Erro interno no servidor.' })
     }
 })
+
+//endpoint de agendamentos
+routes.get('/get/all/agendamentos', async (req, res) =>{
+    try{
+     const agendamento = await Agendamento.findAll({
+          include: {
+                    model: Servicos,
+                    as : 'servico',
+                    attributes: ['id', 'nome', 'preco', 'duracao', 'imagem'],
+                
+                }
+     })  
+    return res.status(200).json(agendamento)
+} catch (error) {
+    console.error('Erro ao buscar todos os agendamentos:', error)
+    res.status(500).json({message:'Erro interno no servidor.'})
+}
+})
+
+    
 
 
 

@@ -17,7 +17,7 @@ const ServicoProfissional = db.sequelize.define('ServicoProfissional', {
     },
 
 
-    servicoId: {
+    ServicoId: {
         type: db.Sequelize.INTEGER,
         references: {
             model: Servicos,
@@ -28,46 +28,46 @@ const ServicoProfissional = db.sequelize.define('ServicoProfissional', {
     },
 
 
-   
+
 })
 
 
- Clientes.belongsToMany(Servicos, {
-        through: ServicoProfissional,
-        foreignKey: 'profissionalId',
-        as: 'servicos'
-    })
+Clientes.belongsToMany(Servicos, {
+    through: ServicoProfissional,
+    foreignKey: 'profissionalId',
+    as: 'servicos'
+})
 
 Servicos.belongsToMany(Clientes, {
-        through: ServicoProfissional,
-        foreignKey: 'ServicoId',
-        as: 'profissionals'
-    })
+    through: ServicoProfissional,
+    foreignKey: 'ServicoId',
+    as: 'profissionais'
+})
 
 ServicoProfissional.belongsTo(Clientes, {
-        foreignKey: 'profissionalId',
-        as: 'professional'
-    })
+    foreignKey: 'profissionalId',
+    as: 'professional'
+})
 
 ServicoProfissional.belongsTo(Servicos, {
-        foreignKey: 'ServicoId',
-        as: 'Servico'
-    })
+    foreignKey: 'ServicoId',
+    as: 'Servico'
+})
 
 Clientes.hasMany(ServicoProfissional, {
-        foreignKey: 'profissionalId',
-        as: 'professionalServices'
-    })
+    foreignKey: 'profissionalId',
+    as: 'professionalServices'
+})
 
 Servicos.hasMany(ServicoProfissional, {
-        foreignKey: 'ServicoId',
-        as: 'profssionalServicos'
-    })
+    foreignKey: 'ServicoId',
+    as: 'profssionalServicos'
+})
 
 
 
 
 
-ServicoProfissional.sync({force:true})
+//ServicoProfissional.sync({force:true})
 
 module.exports = ServicoProfissional

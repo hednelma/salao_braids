@@ -154,6 +154,13 @@ routes.get('/encontrar/meus/agendamentos/:clientesId', async (req, res) => {
             include: {
                 model: Agendamento,
                 as: 'clienteAgendamentos',
+                attributes: ['id', 'data_hora', 'status'],
+                include: {
+                    model: Servicos,
+                    as : 'servico',
+                    attributes: ['id', 'nome', 'preco', 'duracao', 'imagem'],
+                
+                }
             }
         })
         if (cliente) {
@@ -169,6 +176,48 @@ routes.get('/encontrar/meus/agendamentos/:clientesId', async (req, res) => {
     }
 })
 
+//Agendamento de profissional
+routes.get('/buscar/meus/agendamentos/profissional/:profissionalId', async (req, res) => {
+    try {
+        const agendamentos = await Agendamento.findAll({
+            where: { profissionalId: req.params.profissionalId },
+            attributes: ['id', 'data_hora', 'status'],
+            include: {
+                model: Servicos,
+                as: 'servico',
+                attributes: ['id', 'nome', 'preco', 'duracao', 'imagem'],
+            }
+        })
+
+            res.status(200).json(agendamentos)
+        
+    } catch (erro) {
+        console.error(erro)
+        res.status(500).json({ mensagem: "Erro ao buscar agendamentos" })
+    }
+})
+
+
+// endpoint para fazer Agendamento
+routes.post('/fazer/agendamento', async (req, res) => {
+
+    console.log(req.body)
+
+    try {
+        const {clienteId, profissionalId, servicoId, data_hora} = req.body
+        const agendamento = await Agendamento.create({ clienteId, profissionalId, servicoId, data_hora, status: 'pendente' })
+        if (agendamento) {
+            res.status(200).json(agendamento)
+        } else {
+            res.status(404).json({ message: "Erro ao criar agendamento" })
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ message: "Erro ao criar agendamento" })
+    }
+})
+
+
 // endpiont para encontrar todos os servicos de profissional
 routes.get('/find/servicos/profissional/:id', async (req, res) => {
     try {
@@ -179,7 +228,7 @@ routes.get('/find/servicos/profissional/:id', async (req, res) => {
             include: [{
                 model: Servicos,
                 as: 'servicos',
-                attributes: ['id', 'nome', 'descricao'],
+                attributes: ['id', 'nome', 'duracao', 'preco', 'imagem'],
             }]
         })
 
@@ -202,11 +251,12 @@ routes.get('/find/profissionais/servico/:id', async (req, res) => {
         const { id } = req.params
 
         // Supondo que 'servico' tenha uma associação com 'profissionais'
-        const servicoEncontrado = await servico.findByPk(id, {
+        const servicoEncontrado = await Servicos.findByPk(id, {
             include: [{
                 model: Cliente,
                 as: 'profissionais', // ajuste conforme o alias usado na associação
-                through: { attributes: [] } // remove dados da tabela intermediária
+                through: { attributes: [] },// remove dados da tabela intermediária
+                attributes: ['id', 'nome', 'foto' ]
             }]
         })
 

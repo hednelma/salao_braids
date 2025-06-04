@@ -4,6 +4,7 @@ const Cliente = require('./../models/Cliente')
 const Email = require('./../email/enviadordeemail')
 const jwt = require('../configs/auth')
 const bcrypt = require('bcryptjs')
+
 const { Op } = require('sequelize')
 const generateUserName = require('../funçao/generateUserName')
 
