@@ -146,7 +146,7 @@ routes.delete('/delete/my/account/:userId', async (req, res) => {
 })
 
 
-//Agendamento
+//endpoint de encontrar Agendamento
 routes.get('/encontrar/meus/agendamentos/:clientesId', async (req, res) => {
     try {
 
@@ -176,7 +176,23 @@ routes.get('/encontrar/meus/agendamentos/:clientesId', async (req, res) => {
     }
 })
 
-//Agendamento de profissional
+//endpoint para buscar horario dos agendamentos feitos
+routes.get('/buscar/meus/agendamentos/time/profissional/:profissionalId', async (req, res) => {
+    try {
+        const agendamentos = await Agendamento.findAll({
+            where: { profissionalId: req.params.profissionalId },
+            attributes: ['id', 'data_hora'],
+        })
+
+            res.status(200).json(agendamentos)
+        
+    } catch (erro) {
+        console.error(erro)
+        res.status(500).json({ mensagem: "Erro ao buscar agendamentos" })
+    }
+})
+
+// endpoint de buscar os agendamentos do profissionais
 routes.get('/buscar/meus/agendamentos/profissional/:profissionalId', async (req, res) => {
     try {
         const agendamentos = await Agendamento.findAll({
