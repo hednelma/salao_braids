@@ -145,6 +145,20 @@ routes.delete('/delete/my/account/:userId', async (req, res) => {
     }
 })
 
+// endpoint para remover aendamento
+routes.delete('/delete/my/agendamento/:id', async (req, res) => {
+    try {
+        const agendamento = await Agendamento.destroy({ where: { id: req.params.id } })
+        if (agendamento)
+            res.status(200).json('Agendamento removido')
+        else
+            res.status(404).json('Agendamento não encontrado')
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ message: "Erro ao remover agendamento" })
+    }
+})
+
 
 //endpoint de encontrar Agendamento
 routes.get('/encontrar/meus/agendamentos/:clientesId', async (req, res) => {
