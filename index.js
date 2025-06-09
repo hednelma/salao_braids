@@ -3,6 +3,7 @@ const cors = require('cors')
 const visitante = require('./routes/visitante')
 const cliente = require('./routes/cliente')
 const administrador = require('./routes/administrador')
+const { sendLembretes } = require('./funçao/sendLembrete')
 const app = express()
 const port = 4041
 
@@ -21,6 +22,12 @@ app.get('/', (req, res) => {
     res.send("Essta funcionando...")
 })
 
+
+
 app.listen(port, () => {
+    setInterval (async ()=> {
+        await sendLembretes()
+    }, 60000)
+   
     console.log('Server is ronning on port', port)
 })

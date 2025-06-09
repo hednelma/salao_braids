@@ -123,14 +123,8 @@ routes.post('/add/service/ao/profissional', async (req, res) => {
     try {
         const { profissionalId, services } = req.body
 
-        for await (const service of services) {
-            try {
-                const new_service = await ServicoProfissional.create({ ServicoId: service, profissionalId: profissionalId })
-            } catch (error) {
-                console.log('Não fi possivel adicionar este serviço ao profissional', error)
-            }
-        }
-
+        const new_service = await ServicoProfissional.create({ ServicoId: services.id, profissionalId: profissionalId })
+        
         res.status(200).json({ message: "Sucesso ao atribuir serviços ao profissional" })
 
     } catch (error) {
@@ -273,24 +267,24 @@ routes.delete('/delete/servico/:id', async (req, res) => {
 })
 
 //endpoint de agendamentos
-routes.get('/get/all/agendamentos', async (req, res) =>{
-    try{
-     const agendamento = await Agendamento.findAll({
-          include: {
-                    model: Servicos,
-                    as : 'servico',
-                    attributes: ['id', 'nome', 'preco', 'duracao', 'imagem'],
-                
-                }
-     })  
-    return res.status(200).json(agendamento)
-} catch (error) {
-    console.error('Erro ao buscar todos os agendamentos:', error)
-    res.status(500).json({message:'Erro interno no servidor.'})
-}
+routes.get('/get/all/agendamentos', async (req, res) => {
+    try {
+        const agendamento = await Agendamento.findAll({
+            include: {
+                model: Servicos,
+                as: 'servico',
+                attributes: ['id', 'nome', 'preco', 'duracao', 'imagem'],
+
+            }
+        })
+        return res.status(200).json(agendamento)
+    } catch (error) {
+        console.error('Erro ao buscar todos os agendamentos:', error)
+        res.status(500).json({ message: 'Erro interno no servidor.' })
+    }
 })
 
-    
+
 
 
 
