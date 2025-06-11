@@ -3,8 +3,45 @@ const Appointment = require('./../models/Agendamento')
 const User = require('../models/Cliente')
 const Email = require('./../email/senderMailAppointment')
 const Servicos = require('../models/Servisos')
+const Agendamento = require('./../models/Agendamento')
+const moment = require('moment')
+
+const removerAgendamentosAntigos = async () => {
+    try {
+        // Data limite: há 2 dias atrás
+        const dataLimite = moment().subtract(2, 'days').toDate();
+        const dataAtualizar = moment().subtract(1, 'days').toDate();
+
+        // Remover registros com data de agendamento menor que a data limite
+        const resultado = await Agendamento.destroy({
+            where: {
+                data_hora: {
+                    [Op.lt]: dataLimite
+                }
+            }
+        });
+
+        const resultadoAtualizado = await Agendamento.update({ status: 'realizado' }, {
+            where: {
+                data_hora: {
+                    [Op.lt]: dataAtualizar
+                }
+            }
+        });
+
+        console.log(`${resultado} agendamento(s) removido(s).`);
+        return resultado;
+    } catch (error) {
+        console.error('Erro ao remover agendamentos antigos:', error);
+        throw error;
+    }
+};
+
 
 const buscarTodosAgendamentosDoDia = async () => {
+
+
+    await removerAgendamentosAntigos()
 
     try {
 
@@ -58,7 +95,7 @@ const lembretesToSends = async (lembretesToSend) => {
         // Verifica se deve enviar lembrete de 20 minutos
         if (diferencaMinutos === 20) {
             await Email.enviarEmail(lembrete.client, lembrete.data_hora.split(' ')[1], lembrete.servico, lembrete.professional)
-      
+
         }
     }
 }

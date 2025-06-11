@@ -10,6 +10,7 @@ const Clientes = require('../models/Cliente')
 const Agendamento = require('../models/Agendamento')
 const Servicos = require('../models/Servisos')
 const ServicoProfissional = require('../models/ServicoProfissional')
+const Avaliacao = require('../models/Avaliacoes')
 
 
 
@@ -168,7 +169,7 @@ routes.get('/encontrar/meus/agendamentos/:clientesId', async (req, res) => {
             include: {
                 model: Agendamento,
                 as: 'clienteAgendamentos',
-                attributes: ['id', 'data_hora', 'status'],
+                attributes: ['id', 'data_hora', 'status', 'clienteId', 'profissionalId', 'servicoId'],
                 include: {
                     model: Servicos,
                     as : 'servico',
@@ -303,6 +304,42 @@ routes.get('/find/profissionais/servico/:id', async (req, res) => {
     } catch (error) {
         console.log('Um erro ocorreu: ', error)
         return res.status(500).json({ error: 'Ocorreu um erro ao buscar os profissionais.' })
+    }
+})
+
+
+//endpoint de avaliacao
+routes.post('/evaluation', async (req, res) => {
+    try {
+        const { clientId, professionalId, serviceId, rating, comments } = req.body
+        const evaluation = await Avaliacao.create({ clientId, professionalId, serviceId, rating, comments })
+        res.status(200).json({ message: 'Avaliação realizada com sucesso.' })
+    } catch (error) {
+        console.log('Um erro ocorreu: ', error)
+        res.status(500).json({ error: 'Ocorreu um erro ao realizar a aval iação.' })
+    }
+})
+
+// Endpoint para buscar avaliacao do profissional
+routes.get('/evaluation/:profissionalId', async (req, res) => {
+
+    try {
+        const evaluations = await Avaliacao.findAll({
+            attributes: ['id', 'rating', 'comments', 'createdAt'],
+            include: [
+                {
+                    model: Cliente,
+                    as: 'client',
+                    attributes: ['id', 'nome'],
+                }
+            ],
+            where: { professionalId: req.params.profissionalId }
+        })
+        res.status(200).json(evaluations)
+
+    } catch (error) {
+        console.log('Um erro ocorreu: ', error)
+        res.status(500).json({ error: 'Ocorreu um erro ao realizar a aval iação.' })
     }
 })
 
